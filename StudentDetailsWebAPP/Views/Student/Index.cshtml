@@ -29,7 +29,7 @@
             <form method="post">
                 <label for="PRN">PRN:</label>
                 <div class="clearable">
-                    <input type="text" class="form-control" id="searchprn">
+                    <input type="number" class="form-control" id="searchprn">
                     <span class="clear-button" onclick="ClearValues()">✕</span>
                 </div>
             </form>
@@ -50,11 +50,11 @@
         </div>
         <div class="form-group col-md-3">
             <label for="ClassName">Parent contact 1:</label>
-            <input type="text" class="form-control" id="parentcontact1" />
+            <input type="number" class="form-control" id="parentcontact1" maxlength="10"/>
         </div>
         <div class="form-group col-md-3">
             <label for="ClassName">Parent contact 2:</label>
-            <input type="text" class="form-control" id="parentcontact2" />
+            <input type="number" class="form-control" id="parentcontact2" maxlength="10"/>
         </div>
     </div>
     <div class="row">
@@ -68,30 +68,58 @@
             <select id="classname" class="form-control"></select>
         </div>
         <div class="form-group col-md-3">
-            <label for="StudentName">Exam Type:</label>
+            <label for="examtype">Exam Type:</label>
             @*<input type="text" class="form-control" id="examtype" />*@
             <select id="examtype" class="form-control"></select>
         </div>
         <div class="form-group col-md-3">
-            <label for="StudentName">Roll No:</label>
-            <input type="text" class="form-control" id="rollno" />
+            <label for="rollno">Roll No:</label>
+            <input type="number" class="form-control" id="rollno" />
         </div>
     </div>
     <fieldset>
         <legend>Student Marks</legend>
-        <div class="row">
-            <div class="form-group col-md-4">
+        <div class="row" style="margin-bottom: 15px;">
+            <div class="form-group col-md-3">
                 <label for="StudentName">Subject:</label>
-                <input type="text" class="form-control" id="subject" />
+                @*<input type="text" class="form-control" id="subject" />*@
+                <select id="subject" class="form-control">
+                    <option> --Select Subject-- </option>
+                </select>
+                <input type="hidden" id="subjectName" />
             </div>
-            <div class="form-group col-md-4">
-                <label for="StudentName">Total Marks:</label>
-                <input type="text" class="form-control" id="totalmarks" />
+            <div class="form-group col-md-3">
+                <label for="totalmarks">Total Marks:</label>
+                <input type="number" class="form-control" id="totalmarks" readonly ="readonly"/>
             </div>
-            <div class="form-group col-md-4">
-                <label for="StudentName">Obtained Marks:</label>
-                <input type="text" class="form-control" id="obtainedmarks" />
+            <div class="form-group col-md-3">
+                <label for="obtainedmarks">Obtained Marks:</label>
+                <input type="number" class="form-control" id="obtainedmarks" onchange="EnableAddButton();" />
             </div>
+            <div class="form-group col-md-1">
+                <label for="AddMarks"></label>
+                <input type="button" class="form-control btn-primary" id="addmarks" value="Add" disabled />
+            </div>
+        </div>
+        <div class="row">
+            <table class="table table-condensed table-bordered">
+                <thead>
+                    <tr>
+                        <td>Subject ID</td>
+                        <td>Subject Name</td>
+                        <td>Total Marks</td>
+                        <td>Marks obtained</td>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                <tbody id="tablelistbody">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="row justify-content-end">
+            <input type="button" class="btn-primary col-md-1" id="SaveDetails" value="Submit" />
+            <input type="button" class="btn-danger col-md-1 ml-2" style="margin-right:5px;margin-left:10px;" id="ClearDetails" value="Clear" />
         </div>
     </fieldset>
 </div>

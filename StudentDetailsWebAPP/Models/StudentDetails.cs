@@ -4,6 +4,7 @@ namespace StudentDetailsWebAPP.Models
 {
     public class StudentDetails
     {
+        public string? PRN { get; set; }
         public string? studentName { get; set; }
         public string? studentAddress { get; set; }
         public string? ParentContact1 { get; set; }
@@ -17,5 +18,7 @@ namespace StudentDetailsWebAPP.Models
 
         public List<SelectListItem>? ListofClassNames { get; set; }
         public List<SelectListItem>? ListofExamTypes { get; set; }
+
+        public List<StudentMarks> ListofStudentMarks { get; set; }
     }
 }

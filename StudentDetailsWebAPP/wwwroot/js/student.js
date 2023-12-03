@@ -26,6 +26,25 @@
             GetStudentDetails(ui.item.course)
         }
     });
+    $('#classname').change(function () {
+        $("#totalmarks").val("");
+        $("#obtainedmarks").val("");
+        var selectedValue = $(this).val();
+        GetSubjects(selectedValue);
+    });
+    $('#subject').change(function () {
+        var selectedValue = $(this).val();
+        var subjectName = $(this).find('option:selected').text();
+        $("#subjectName").val(subjectName);
+        GetSubjectsMarks(selectedValue);
+        EnableAddButton();
+    });
+    $("#addmarks").click(function () {
+        AddMarksToList();
+    });
+    $("#SaveDetails").click(function () {
+        SaveStudentDetails();
+    });
 });
 function GetStudentDetails(prnno) {
     $.ajax({
@@ -74,7 +93,6 @@ function LoadClassExamDetails() {
         }
     });
 }
-
 function ClearValues() {
     $("#searchprn").val("");
     $("#studentname").val("");
@@ -83,5 +101,102 @@ function ClearValues() {
     $("#parentcontact2").val("");
     $("#studentemailID").val("");
     $("#Rollno").val("");
+    
     $("#searchprn").prop("readonly", false);
+}
+function GetSubjects(selectedValue) {
+    $.ajax({
+        url: "/Student/GetSubjectDetails?ClassID=" + selectedValue,
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            $("#subject").empty();
+            $("#subject").append("<option> --Select Subject-- </option>");
+            $.each(data, function (key, item) {
+                $("#subject").append($("<option>", {
+                    value: item.subjectID,
+                    text: item.subjectName
+                }));
+            });
+        }
+    });
+}
+function GetSubjectsMarks(selectedValue) {
+    $.ajax({
+        url: "/Student/GetSubjectTotalMarks?SubjectID=" + selectedValue,
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            $("#totalmarks").val(data);
+        }
+    });
+}
+function EnableAddButton() {
+    var subject=$("#subject").val();
+    var totalMarks=$("#totalmarks").val();
+    var obtainedMarks = $("#obtainedmarks").val();
+    if (parseInt(subject) > 0 && subject != "--Select Subject--" && parseInt(totalMarks) > 0 && parseInt(obtainedMarks) > 0  && parseInt(obtainedMarks) <= parseInt(totalMarks)) {
+        $('#addmarks').prop('disabled', false);
+    } else {
+        $('#addmarks').prop('disabled', true);
+    }
+}
+function AddMarksToList() {
+    var subjectID = $("#subject").val();
+    var subjectName = $("#subjectName").val();
+    var totalMarks=$("#totalmarks").val();
+    var obtainedMarks = $("#obtainedmarks").val();
+    var row = "<tr style='height: 10px;'><td>" + subjectID
+        + "</td><td>" + subjectName
+        + "</td><td>" + totalMarks
+        + "</td><td>" + obtainedMarks
+        + "</td><td>" + "<input type='button' class='form-control btn-danger' id='removemarks' value='X' onclick='removerow();'/>"
+        + "</td></tr>";
+    $("#tablelistbody").append(row);
+
+}
+function SaveStudentDetails() {
+    var PRN=$("#searchprn").val();
+    var studentName=$("#studentname").val();
+    var studentAddress=$("#studentaddress").val();
+    var parentContact1=$("#parentcontact1").val();
+    var parentContact2 =$("#parentcontact2").val();
+    var StudentEmailID = $("#studentemailID").val();
+    var className = $("#classname").val();
+    var examName = $("#examtype").val();
+    var rollNo = $("#rollno").val();
+    var studentdetails = {};
+    studentdetails.PRN = PRN;
+    studentdetails.studentName = studentName;
+    studentdetails.studentAddress = studentAddress;
+    studentdetails.ParentContact1 = parentContact1;
+    studentdetails.ParentContact2 = parentContact2;
+    studentdetails.studentEmailID = StudentEmailID;
+    studentdetails.ClassMasterID = className;
+    studentdetails.ExamMasterID = examName;
+    studentdetails.Rollno = rollNo;
+    var ListofStudentMarks = [];
+    var body = $("#tablelistbody tr");
+    $.each(body, function () {
+        var subjectID = $(this).find("td:eq(0)").text();
+        var subject = $(this).find("td:eq(1)").text();
+        var Marks = $(this).find("td:eq(3)").text();
+        var studentMarks = {};
+        studentMarks.subjectID = subjectID;
+        studentMarks.Marks = Marks;
+        ListofStudentMarks.push(studentMarks);
+    });
+    studentdetails.ListofStudentMarks = ListofStudentMarks;
+    var data = JSON.stringify(studentdetails);
+    $.ajax({
+        async: true,
+        url: "/Student/SaveStudentDetails",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: data,
+        success: function (data) {
+            
+        }
+    });
 }
