@@ -19,6 +19,6 @@ namespace StudentDetailsWebAPP.Models
         public List<SelectListItem>? ListofClassNames { get; set; }
         public List<SelectListItem>? ListofExamTypes { get; set; }
 
-        public List<StudentMarks> ListofStudentMarks { get; set; }
+        public List<StudentMarks>? ListofStudentMarks { get; set; }
     }
 }

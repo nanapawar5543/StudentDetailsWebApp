@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using StudentDetailsWebAPP.APIConsumer;
 using StudentDetailsWebAPP.Models;
+using System.Text;
 
 namespace StudentDetailsWebAPP.Controllers
 {
@@ -56,17 +57,17 @@ namespace StudentDetailsWebAPP.Controllers
             }
         }
         [HttpGet]
-        public async Task<JsonResult> GetSubjectDetails(int ClassID)
+        public async Task<JsonResult> GetSubjectDetails(int ClassID, int ExamTypeID, string PRN)
         {
-            if (ClassID > 0)
+            if (ClassID > 0 && ExamTypeID > 0 && PRN != "")
             {
                 using (HttpClient client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true }))
                 {
-                    string queryString = "?ClassID=" + ClassID;
+                    string queryString = "?ClassID=" + ClassID + "&ExamTypeID=" + ExamTypeID + "&PRN=" + PRN;
                     string methodName = "/GetSubjectDetails";
                     HttpResponseMessage response = await client.GetAsync(base.StudentAPIURL + methodName + queryString);
                     var result = response.Content.ReadAsStringAsync().Result;
-                    var data = JsonConvert.DeserializeObject<List<SubjectMaster>>(result);
+                    var data = JsonConvert.DeserializeObject<StudentSubjectMarkDetails>(result);
                     return Json(data);
                 }
             }
@@ -90,22 +91,31 @@ namespace StudentDetailsWebAPP.Controllers
             return null;
         }
         [HttpPost]
-        public async Task<JsonResult> SaveStudentDetails(StudentDetails studentdetails)
+        public async Task<JsonResult> SaveStudentDetails([FromBody] StudentDetails studentdetails)
         {
-            if (studentdetails != null)
+            try
             {
-                using (HttpClient client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = true }))
+                if (studentdetails != null)
                 {
-                    string queryString = "?SubjectID=";
-                    string methodName = "/GetSubjectTotalMarks";
-                    HttpResponseMessage response = await client.GetAsync(base.StudentAPIURL + methodName + queryString);
-                    var result = response.Content.ReadAsStringAsync().Result;
-                    int Marks = JsonConvert.DeserializeObject<int>(result);
-                    return Json(Marks);
+                    using (HttpClient client = new HttpClient())
+                    {
+                        var json = JsonConvert.SerializeObject(studentdetails);
+                        var content = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
+                        string queryString = "";
+                        string methodName = "/SaveStudentDetails";
+                        HttpResponseMessage response = await client.PostAsync(base.StudentAPIURL + methodName + queryString, content);
+                        var result = response.Content.ReadAsStringAsync().Result;
+                        var Marks = JsonConvert.DeserializeObject<int>(result);
+                        return Json(Marks);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+
             }
             return null;
         }
-        
+
     }
 }

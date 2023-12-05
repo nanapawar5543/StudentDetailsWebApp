@@ -1,11 +1,11 @@
 ﻿$(document).ready(function () {
+    $("#rollno").prop("readonly", false);
     LoadClassExamDetails();
     $("#clearvalues").click(function () {
         ClearValues();
     });
     $("#searchprn").autocomplete({
         source: function (request, response) {
-            debugger
             $.ajax({
                 url: "/Student/GetPRNDetails",
                 type: "POST",
@@ -23,14 +23,23 @@
         },
         select: function (event, ui) {
             $("#searchprn").prop("readonly", true);
-            GetStudentDetails(ui.item.course)
+            GetStudentDetails(ui.item.course);
+            GetSubjects();
         }
     });
     $('#classname').change(function () {
         $("#totalmarks").val("");
         $("#obtainedmarks").val("");
         var selectedValue = $(this).val();
-        GetSubjects(selectedValue);
+        $("#classnameid").val(selectedValue);
+        GetSubjects();
+    });
+    $('#examtype').change(function () {
+        $("#totalmarks").val("");
+        $("#obtainedmarks").val("");
+        var selectedValue = $(this).val();
+        $("#examtypeid").val(selectedValue);
+        GetSubjects();
     });
     $('#subject').change(function () {
         var selectedValue = $(this).val();
@@ -104,22 +113,43 @@ function ClearValues() {
     
     $("#searchprn").prop("readonly", false);
 }
-function GetSubjects(selectedValue) {
-    $.ajax({
-        url: "/Student/GetSubjectDetails?ClassID=" + selectedValue,
-        type: "GET",
-        dataType: "json",
-        success: function (data) {
-            $("#subject").empty();
-            $("#subject").append("<option> --Select Subject-- </option>");
-            $.each(data, function (key, item) {
-                $("#subject").append($("<option>", {
-                    value: item.subjectID,
-                    text: item.subjectName
-                }));
-            });
-        }
-    });
+function GetSubjects() {
+    var classid = $("#classnameid").val();
+    var examtypeid = $("#examtypeid").val();
+    var PRN = $("#searchprn").val();
+    if (parseInt(classid) > 0 && parseInt(examtypeid) > 0 && parseInt(PRN) >0 && PRN != "") {
+        $.ajax({
+            url: "/Student/GetSubjectDetails?ClassID=" + classid + "&ExamTypeID=" + examtypeid + "&PRN=" + PRN,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                $("#rollno").val(data.rollno);
+                if (data.rollno > 0) {
+                    $("#rollno").prop("readonly", true);
+                } else {
+                    $("#rollno").prop("readonly", false);
+                }
+                $("#subject").empty();
+                $("#subject").append("<option> --Select Subject-- </option>");
+                $.each(data.listSubjectMasters, function (key, item) {
+                    $("#subject").append($("<option>", {
+                        value: item.subjectID,
+                        text: item.subjectName
+                    }));
+                });
+                $("#tablelistbody").empty();
+                $.each(data.listStudentMarks, function (key, item) {
+                    var row = "<tr><td>" + item.subjectID
+                        + "</td><td>" + item.SubjectName
+                        + "</td><td>" + item.TotalMarks
+                        + "</td><td>" + item.ObtainedMarks
+                        + "</td><td>" + "<input type='button' class='form-control btn-danger' id='removemarks' value='X' onclick='removerow();'/>"
+                        + "</td></tr>";
+                    $("#tablelistbody").append(row);
+                });
+            }
+        });
+    }
 }
 function GetSubjectsMarks(selectedValue) {
     $.ajax({
