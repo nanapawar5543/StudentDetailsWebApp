@@ -19,6 +19,10 @@
             transform: translateY(-50%);
             cursor: pointer;
         }
+
+    .invalid-textbox {
+        border: 2px solid red;
+    }
 </style>
 <div class="container">
     <div class="col-md-12">
@@ -100,7 +104,7 @@
             </div>
             <div class="form-group col-md-1">
                 <label for="AddMarks"></label>
-                <input type="button" class="form-control btn-primary" id="addmarks" value="Add" disabled />
+                <input type="button" class="form-control btn-primary" id="addmarks" value="Add" />
             </div>
         </div>
         <div class="row">
@@ -121,7 +125,7 @@
         </div>
         <div class="row justify-content-end">
             <input type="button" class="btn-primary col-md-1" id="SaveDetails" value="Submit" />
-            <input type="button" class="btn-danger col-md-1 ml-2" style="margin-right:5px;margin-left:10px;" id="ClearDetails" value="Clear" />
+            <input type="button" class="btn-danger col-md-1 ml-2" style="margin-right:5px;margin-left:10px;" id="ClearDetails" value="Clear" onclick="ClearValues();"/>
         </div>
     </fieldset>
 </div>
